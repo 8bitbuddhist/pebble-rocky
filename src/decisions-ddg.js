@@ -2,7 +2,8 @@ var Decisions_DDG = {
 	name : "decisions-duckduckgo",
 	
 	decide:function(tokens, main, settings, branches, branchIndex, decision_callback) {
-		console.log(this.name + ": entered branch.");
+		var instance = this;
+		console.log(instance.name + ": entered branch.");
 		// Search for any text not recognized in another branch
 		// Format the search string
 		var token_string = "";
@@ -19,7 +20,7 @@ var Decisions_DDG = {
 				method: 'get'
 			},
 			function(data, status, request) {
-				console.log(this.name + ": search complete - " + JSON.stringify(data));
+				console.log(instance.name + ": search complete - " + JSON.stringify(data));
 				// Return an Instant Answer field
 				if (data.Answer) {
 					main.title("DuckDuckGo Results");
@@ -34,12 +35,12 @@ var Decisions_DDG = {
 					main.body(data.AbstractText);
 				}
 				else {
-					console.log(this.name + ": no search results found.");
+					console.log(instance.name + ": no search results found.");
 					decision_callback(tokens, main, settings, branches, branchIndex);
 				}
 			},
 			function(error, status, request) {
-				console.log(this.name + ": search failed - " + error);
+				console.log(instance.name + ": search failed - " + error);
 				decision_callback(tokens, main, settings, branches, branchIndex);
 			}
 		);

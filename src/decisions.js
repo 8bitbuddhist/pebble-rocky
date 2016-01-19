@@ -15,6 +15,7 @@ var Decisions = {
 				return branches[branchIndex].decide(tokens, main, settings, branches, branchIndex, decision_callback);
 			}
 			else {
+				main.title("Rocky");
 				main.body("No match found for '" + tokens.join(" ") + "'");
 			}
 		};
