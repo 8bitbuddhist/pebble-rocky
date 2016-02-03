@@ -4,6 +4,7 @@ var Decisions = {
 
 		// Add your decision-makers to the array
 		branches.push(require('decisions-owncloud.js'));
+		branches.push(require('decisions-weather.js'));
 		branches.push(require('decisions-ddg.js'));
 
 		main.body("Loading...");

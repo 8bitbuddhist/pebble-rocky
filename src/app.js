@@ -5,7 +5,7 @@ var Decisions = require('decisions.js');
 
 // Handle configuration changes
 Settings.config(
-  { url: 'https://amenoph.us/rocky' },
+  { url: 'https://anewman2.github.io/pebble/rocky/' },
   function(e) {
 		console.log('Opening configurable.');
   },
@@ -20,9 +20,9 @@ Settings.config(
 var main = new UI.Card({
 	//title: 'Rocky',
 	scrollable: true,
-	font: 'gothic-18',
+	font: 'gothic-14',
 	title: 'Rocky',
-	body: 'Hi, I\'m Rocky! Ask me anything, like "what\'s on my calendar" or "who is Carl Sagan"!'
+	body: 'Ask me anything, such as "what\'s on my calendar" or "what\'s the weather forecast."'
 });
 
 // Method for starting search
@@ -35,7 +35,6 @@ var start_search = function() {
 		}
 		
 		var tokens = e.transcription.split(" ");
-		//var tokens = ["what's", "on", "my", "calendar"];
 
 		console.log("Tokens: " + tokens);
 		// Change all tokens to lowercase
