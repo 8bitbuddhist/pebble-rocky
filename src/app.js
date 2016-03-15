@@ -20,9 +20,9 @@ Settings.config(
 var main = new UI.Card({
 	//title: 'Rocky',
 	scrollable: true,
-	font: 'gothic-14',
-	title: 'Rocky',
-	body: 'Ask me anything, such as "what\'s on my calendar" or "what\'s the weather forecast."'
+	font: 'gothic-8',
+	title: 'What\s up?',
+	body: 'What\'s on the agenda?\nWhat\'s today\'s forecast?\nWho is John Galt?'
 });
 
 // Method for starting search

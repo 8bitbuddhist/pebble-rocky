@@ -45,7 +45,7 @@ var Decisions_Weather = {
 	decide:function(tokens, main, settings, branches, branchIndex, decision_callback) {
 		var instance = this;
 		console.log(instance.name + ": entered branch.");
-		if ((tokens.indexOf("weather") >= 0 && tokens.indexOf("forecast") >= 0)) {
+		if ((tokens.indexOf("weather") >= 0 || tokens.indexOf("forecast") >= 0)) {
 			navigator.geolocation.getCurrentPosition(function(pos) {
 				// Got location info: we can call OWM
 				console.log("got location info: " + JSON.stringify(pos));
