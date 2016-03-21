@@ -2,7 +2,7 @@ var Decisions_Test = {
 	name : "decisions-test",
 	results : [],
 	
-	decide:function(tokens, main, settings, branches, branchIndex, decision_callback) {
+	decide:function(tokens, branchIndex, decision_callback) {
 		console.log("Entered branch: " + this.name);
 		if (tokens[0] === "test") {
 			if (tokens[1] === "me") {
@@ -25,7 +25,7 @@ var Decisions_Test = {
 			return;
 		}
 		else {
-			decision_callback(tokens, main, settings, branches, branchIndex);
+			decision_callback(tokens, branchIndex);
 		}
 	}
 };

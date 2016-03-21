@@ -1,5 +1,5 @@
 var Decisions = {
-	determine_response:function (tokens, main, settings) {
+	determine_response:function (tokens) {
 		var branches = [];
 
 		// Add your decision-makers to the array
@@ -7,23 +7,28 @@ var Decisions = {
 		branches.push(require('decisions-weather.js'));
 		branches.push(require('decisions-ddg.js'));
 
-		main.body("Loading...");
+		//main.body("Loading...");
 		
 		// Called whenever a decision-maker can't reach a final decision
-		var decision_callback = function (tokens, main, settings, branches, branchIndex) {
+		var decision_callback = function (tokens, branchIndex) {
 			branchIndex++;
 			if (branches[branchIndex]) {
-				return branches[branchIndex].decide(tokens, main, settings, branches, branchIndex, decision_callback);
+				return branches[branchIndex].decide(tokens, branchIndex, decision_callback);
 			}
 			else {
-				main.title("Rocky");
-				main.body("No match found for '" + tokens.join(" ") + "'");
+				var UI = require('ui');
+				var card = new UI.Card({
+					title: 'Rocky',
+					body: 'No match found for \'' + tokens.join(" ") + '\''
+				});
+				card.show();
+				console.log("Reached end of decision tree. No match found for '" + tokens.join(" ") + "'");
 			}
 		};
 		
 		// Kick off the decision tree
 		var branchIndex = 0;
-		branches[0].decide(tokens, main, settings, branches, branchIndex, decision_callback);
+		branches[0].decide(tokens, branchIndex, decision_callback);
 	}
 };
 

@@ -3,6 +3,9 @@ var UI = require('ui');
 var Voice = require('ui/voice');
 var Decisions = require('decisions.js');
 
+// If in production mode, set to false
+var DEBUG = true;
+
 // Handle configuration changes
 Settings.config(
   { url: 'https://anewman2.github.io/pebble/rocky/' },
@@ -19,35 +22,54 @@ Settings.config(
 
 var main = new UI.Card({
 	//title: 'Rocky',
-	scrollable: true,
 	font: 'gothic-8',
-	title: 'What\s up?',
-	body: 'What\'s on the agenda?\nWhat\'s today\'s forecast?\nWho is John Galt?'
+	title: 'Rocky',
+	body: 'What can I help you with?'
 });
 
 // Method for starting search
 var start_search = function() {
 	// Start a diction session and skip confirmation
-	Voice.dictate('start', false, function(e) {
-		if (e.err) {
-			console.log('Transcription failed: ' + e.err);
-			return;
-		}
+	var parse = function(transcription) {
+		var tokens = transcription.split(" ");
+		console.debug("Raw transcription: " + tokens);
 		
-		var tokens = e.transcription.split(" ");
-
-		console.log("Tokens: " + tokens);
 		// Change all tokens to lowercase
 		for (var i = 0; i < tokens.length; i++) {
 			tokens[i] = tokens[i].toLowerCase();
 		}
+		
 		// Make tokens JSON-safe
 		JSON.stringify(tokens);
 		
-		Decisions.determine_response(tokens, main, Settings);
-	});
+		console.debug("Formatted tokens: " + tokens);
+		
+		// Start decision tree
+		Decisions.determine_response(tokens);
+	};
+	
+	// If in debug mode, use manually supply input. Otherwise use voice recognition
+	if (DEBUG === false) {
+		Voice.dictate('start', false, function(e) {
+			if (e.err) {
+				console.log('Transcription failed: ' + e.err);
+				return;
+			}
+
+			parse(e.transcription);
+		});
+	}
+	else {
+		// TESTING: Enter test commands here
+		parse("what's on my calendar");
+	}
 };
 
+// Refresh ownCloud calendar if necessary
+var owncloud = require('decisions-owncloud.js');
+owncloud.refresh_calendar();
+
+// Start the main app
 main.show();
 start_search();
 

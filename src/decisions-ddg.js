@@ -1,7 +1,7 @@
 var Decisions_DDG = {
 	name : "decisions-duckduckgo",
 	
-	decide:function(tokens, main, settings, branches, branchIndex, decision_callback) {
+	decide:function(tokens, branchIndex, decision_callback) {
 		var instance = this;
 		console.log(instance.name + ": entered branch.");
 		// Search for any text not recognized in another branch
@@ -17,31 +17,37 @@ var Decisions_DDG = {
 			{
 				url: 'http://api.duckduckgo.com/?q=' + token_string + '&format=json&no_html=1',
 				type: 'json',
-				method: 'get'
+				method: 'GET'
 			},
 			function(data, status, request) {
 				console.log(instance.name + ": search complete - " + JSON.stringify(data));
+				
+				var UI = require('ui');
+				var card = new UI.Card({
+					title: 'DuckDuckGo Results',
+				});
+				
 				// Return an Instant Answer field
 				if (data.Answer) {
-					main.title("DuckDuckGo Results");
-					main.body(data.Answer);
+					card.body(data.Answer);
+					card.show();
 				}
 				else if (data.Definition) {
-					main.title("DuckDuckGo Results");
-					main.body(data.Definition);
+					card.body(data.Definition);
+					card.show();
 				}
 				else if (data.AbstractText) {
-					main.title("DuckDuckGo Results");
-					main.body(data.AbstractText);
+					card.body(data.AbstractText);
+					card.show();
 				}
 				else {
 					console.log(instance.name + ": no search results found.");
-					decision_callback(tokens, main, settings, branches, branchIndex);
+					decision_callback(tokens, branchIndex);
 				}
 			},
 			function(error, status, request) {
 				console.log(instance.name + ": search failed - " + error);
-				decision_callback(tokens, main, settings, branches, branchIndex);
+				decision_callback(tokens, branchIndex);
 			}
 		);
 	}

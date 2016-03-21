@@ -1,4 +1,6 @@
 var lib_util = {
+
+	// Get the user's currentIP address
 	getPublicIPAddress:function(callback_success, callback_fail, options) {
 		var ajax = require("ajax");
 		ajax(
@@ -14,7 +16,7 @@ var lib_util = {
 			}
 		);
 	},
-	
+
 	kelvinToFahrenheit:function(kelvin) {
 		return (kelvin * 9/5) - 459.67;
 	}

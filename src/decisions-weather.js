@@ -10,7 +10,7 @@ var Decisions_Weather = {
 		timeout: 10000
 	},
 	
-	getWeather : function(latitude, longitude, days, api_key, main) {
+	getWeather : function(latitude, longitude, days, api_key) {
 		var ajax = require('ajax');
 		ajax(
 			{
@@ -33,35 +33,58 @@ var Decisions_Weather = {
 					}
 					output += data.list[day].weather[0].main.toLowerCase() + "\n";
 				}
-				main.body(output);
+				return output;
 			},
 			function(error, status, request) {
 				console.log("decisions-weather: unable to get weather data: " + JSON.stringify(error));
-				main.body("Unable to pull weather data.");
 			}
 		);
 	},
 
-	decide:function(tokens, main, settings, branches, branchIndex, decision_callback) {
+	decide:function(tokens, branchIndex, decision_callback) {
 		var instance = this;
 		console.log(instance.name + ": entered branch.");
 		if ((tokens.indexOf("weather") >= 0 || tokens.indexOf("forecast") >= 0)) {
+			console.log(instance.name + ': Getting weather info.');
+			var UI = require('ui');
+			var card = new UI.Card({
+				title: 'OpenWeatherMap',
+				body: 'Loading...'
+			});
+			card.show();
+			var settings = require('settings');
 			navigator.geolocation.getCurrentPosition(function(pos) {
-				// Got location info: we can call OWM
-				console.log("got location info: " + JSON.stringify(pos));
-				var weather = instance.getWeather(pos.coords.latitude, pos.coords.longitude, instance.forecast_count, settings.option("owm_api_key"), main);
-				console.log("Got weather info: " + weather);
-				main.body(weather);
-			}, function(err) {
-				// Couldn't get location info
-				console.log(instance.name + ": unable to get location info: " + err);
-				main.body("Unable to get location info.");
-			}, instance.locationOptions);
+					// Got location info: we can call OWM
+					console.log(instance.name + ": got location info: " + JSON.stringify(pos));
+					var weather = instance.getWeather(pos.coords.latitude, pos.coords.longitude, instance.forecast_count, settings.option("owm_api_key"));
+					card.body(weather);
+				}, function(err) {
+					// Couldn't get location info: use geoIP
+					console.log(instance.name + ": unable to use navigator. Trying geolocation API.");
+					var ajax = require('ajax');
+					ajax(
+					{
+						url: 'http://ip-api.com/json',
+						method: 'GET',
+						type: 'json'
+					},
+					function(data, status, request) {
+						console.log(instance.name + ": geolocation data received, making request to OWM.");
+						console.debug(instance.name + ': ' + data);
+						var weather = instance.getWeather(data.lat, data.lon, instance.forecast_count, settings.option("own_api_key"));
+						card.body(weather);
+					},
+					function(error, status, request) {
+						console.log(instance.name + ": unable to get location data: " + status + " " + JSON.stringify(error));
+						card.body('Unable to get location data.');
+					});
+					
+				}, instance.locationOptions);
 			return;
 		}
 		else {
 			// Process actions when user input fails.
-			decision_callback(tokens, main, settings, branches, branchIndex);
+			decision_callback(tokens, branchIndex);
 		}
 	}
 };
