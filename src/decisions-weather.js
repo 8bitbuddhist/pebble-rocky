@@ -10,30 +10,37 @@ var Decisions_Weather = {
 		timeout: 10000
 	},
 	
-	getWeather : function(latitude, longitude, days, api_key) {
+	getWeather : function(latitude, longitude, days, api_key, card) {
 		var ajax = require('ajax');
 		ajax(
 			{
-				url: 'http://api.openweathermap.org/data/2.5/forecast?lat=' + latitude + '&lon=' + longitude + '&APPID=' + api_key + '&cnt=' + days,
+				url: 'http://api.openweathermap.org/data/2.5/forecast/daily?lat=' + latitude + '&lon=' + longitude + '&APPID=' + api_key + '&cnt=' + days,
 				type: 'json'
 			},
 			function(data, status, request) {
-				// TODO: Handle response
-				var output = "Forecast for " + data.city.name + ":\n";
+				console.debug('decisions-weather: weather data: ' + JSON.stringify(data));
+				var output = data.city.name + ":\n";
 				var libutil = require("libutil.js");
 				var libdate = require("libdate.js");
 				for (var day = 0; day < days; day++) {
-					var low = Math.round(libutil.kelvinToFahrenheit(data.list[day].main.temp_min));
-					var high = Math.round(libutil.kelvinToFahrenheit(data.list[day].main.temp_max));
+					var low = Math.round(libutil.kelvinToFahrenheit(data.list[day].temp.min));
+					var high = Math.round(libutil.kelvinToFahrenheit(data.list[day].temp.max));
 					if (low !== high) {
-						output += libdate.getDayofWeek(new Date(data.list[day].dt)) + ": " + low + " - " + high + "°F and ";
+						// Retrieve day of week from timestamp
+						output += libdate.getDayofWeek(new Date(data.list[day].dt * 1000)) + ": " + low + " - " + high + "°F and ";
 					}
 					else {
-						output += libdate.getDayofWeek(new Date(data.list[day].dt)) + ": " + low + "°F and ";
+						// Retrieve day of week from timestamp
+						output += libdate.getDayofWeek(new Date(data.list[day].dt * 1000)) + ": " + low + "°F and ";
 					}
 					output += data.list[day].weather[0].main.toLowerCase() + "\n";
 				}
-				return output;
+				if (output) {
+					card.body(output);
+				}
+				else {
+					card.body('Unable to get forecast.');
+				}
 			},
 			function(error, status, request) {
 				console.log("decisions-weather: unable to get weather data: " + JSON.stringify(error));
@@ -48,16 +55,16 @@ var Decisions_Weather = {
 			console.log(instance.name + ': Getting weather info.');
 			var UI = require('ui');
 			var card = new UI.Card({
-				title: 'OpenWeatherMap',
-				body: 'Loading...'
+				title: 'Forecast',
+				body: 'Loading...',
+				scrollable: true
 			});
 			card.show();
 			var settings = require('settings');
 			navigator.geolocation.getCurrentPosition(function(pos) {
 					// Got location info: we can call OWM
 					console.log(instance.name + ": got location info: " + JSON.stringify(pos));
-					var weather = instance.getWeather(pos.coords.latitude, pos.coords.longitude, instance.forecast_count, settings.option("owm_api_key"));
-					card.body(weather);
+					instance.getWeather(pos.coords.latitude, pos.coords.longitude, instance.forecast_count, settings.option("owm_api_key"), card);
 				}, function(err) {
 					// Couldn't get location info: use geoIP
 					console.log(instance.name + ": unable to use navigator. Trying geolocation API.");
@@ -70,9 +77,8 @@ var Decisions_Weather = {
 					},
 					function(data, status, request) {
 						console.log(instance.name + ": geolocation data received, making request to OWM.");
-						console.debug(instance.name + ': ' + data);
-						var weather = instance.getWeather(data.lat, data.lon, instance.forecast_count, settings.option("own_api_key"));
-						card.body(weather);
+						console.debug(instance.name + ': geo data: ' + JSON.stringify(data));
+						instance.getWeather(data.lat, data.lon, instance.forecast_count, settings.option("owm_api_key"), card);
 					},
 					function(error, status, request) {
 						console.log(instance.name + ": unable to get location data: " + status + " " + JSON.stringify(error));

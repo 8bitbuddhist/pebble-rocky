@@ -25,6 +25,7 @@ var Decisions_DDG = {
 				var UI = require('ui');
 				var card = new UI.Card({
 					title: 'DuckDuckGo Results',
+					scrollable: true
 				});
 				
 				// Return an Instant Answer field

@@ -4,7 +4,7 @@ var Voice = require('ui/voice');
 var Decisions = require('decisions.js');
 
 // If in production mode, set to false
-var DEBUG = true;
+var DEBUG = false;
 
 // Handle configuration changes
 Settings.config(
@@ -61,13 +61,13 @@ var start_search = function() {
 	}
 	else {
 		// TESTING: Enter test commands here
-		parse("what's on my calendar");
+		parse("what's the forecast");
 	}
 };
 
 // Refresh ownCloud calendar if necessary
-var owncloud = require('decisions-owncloud.js');
-owncloud.refresh_calendar();
+//var owncloud = require('decisions-owncloud.js');
+//owncloud.refresh_calendar();
 
 // Start the main app
 main.show();

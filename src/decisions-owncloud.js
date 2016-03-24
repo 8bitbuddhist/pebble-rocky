@@ -1,6 +1,6 @@
 var Decisions_ownCloud = {
 	name : "decisions-owncloud",
-	calendar_sync_timeout: 0,		// Time until calendar needs to be refreshed
+	calendar_sync_timeout: 60,		// Time (in minutes) until calendar is refreshed
 
 	buildOutput:function(data, tokens, instance) {
 		// Initialize components
@@ -93,7 +93,8 @@ var Decisions_ownCloud = {
 			// Create a list of calendar items
 			var section = [];
 			var title = '';
-			for (var component of component_list) {
+			//for (var component of component_list) {
+			component_list.forEach(function(component) {
 				var start_time = component.getFirstPropertyValue(date_field).toJSDate();
 				
 				if (search_field === 'vtodo') {
@@ -110,7 +111,7 @@ var Decisions_ownCloud = {
 											description: component.getFirstPropertyValue('description')});
 				}
 				output += libdate.getPaddedDate(start_time) + ' ' + start_time.toTimeString().substr(0, 5) + ': ' + component.getFirstPropertyValue('summary') + '\n';
-			}
+			});
 			
 			// Display the new menu with the calendar items
 			var menu = new UI.Menu({
