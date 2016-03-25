@@ -4,7 +4,7 @@ var Voice = require('ui/voice');
 var Decisions = require('decisions.js');
 
 // If in production mode, set to false
-var DEBUG = false;
+var DEBUG = true;
 
 // Handle configuration changes
 Settings.config(
